@@ -18,7 +18,15 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(helmet());
-app.use(cors({ origin: 'http://localhost:5000' || 'https://finora-iota-ivory.vercel.app' }));
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173", // Vite local frontend
+      "https://finora-iota-ivory.vercel.app",
+    ],
+    credentials: true,
+  })
+);
 app.use(morgan('dev'));
 app.use(express.json());
 
