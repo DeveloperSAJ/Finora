@@ -17,7 +17,7 @@ const getDailyReport = async (req, res) => {
     const result = await pool.query(query, [req.user.id, targetDate]);
     res.json(result.rows);
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server Error in getDailyReport', error: error.message });
   }
 };
 
@@ -38,7 +38,7 @@ const getMonthlyReport = async (req, res) => {
     const result = await pool.query(query, [req.user.id, targetMonth + '-01']);
     res.json(result.rows);
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server Error in getMonthlyReport', error: error.message });
   }
 };
 

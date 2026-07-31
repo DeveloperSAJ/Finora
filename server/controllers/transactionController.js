@@ -36,7 +36,7 @@ const addTransaction = async (req, res) => {
     res.status(201).json(transaction);
   } catch (error) {
     console.error("Add Transaction Error:", error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server Error in addTransaction', error: error.message });
   }
 };
 
@@ -50,7 +50,7 @@ const getUserTransactions = async (req, res) => {
     const transactions = await getTransactions(req.user.id, filters);
     res.json(transactions);
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server Error in getUserTransactions', error: error.message });
   }
 };
 
@@ -60,7 +60,7 @@ const updateUserTransaction = async (req, res) => {
     if (!transaction) return res.status(404).json({ message: 'Transaction not found' });
     res.json(transaction);
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server Error in updateUserTransaction', error: error.message });
   }
 };
 
@@ -70,7 +70,7 @@ const deleteUserTransaction = async (req, res) => {
     if (!transaction) return res.status(404).json({ message: 'Transaction not found' });
     res.json({ message: 'Transaction deleted successfully' });
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server Error in deleteUserTransaction', error: error.message });
   }
 };
 
@@ -97,7 +97,7 @@ const deleteTransactionsByDateRange = async (req, res) => {
     });
   } catch (error) {
     console.error("Bulk Delete Error:", error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server Error in deleteTransactionsByDateRange', error: error.message });
   }
 };
 

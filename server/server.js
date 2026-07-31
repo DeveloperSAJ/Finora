@@ -1,15 +1,15 @@
-const express = require('express');
-const dotenv = require('dotenv');
-const cors = require('cors');
-const helmet = require('helmet');
-const morgan = require('morgan');
+const express = require("express");
+const dotenv = require("dotenv");
+const cors = require("cors");
+const helmet = require("helmet");
+const morgan = require("morgan");
 
-const { connectDB } = require('./config/db');
-const authRoutes = require('./routes/authRoutes');
-const transactionRoutes = require('./routes/transactionRoutes');
-const categoryRoutes = require('./routes/categoryRoutes');
-const reportRoutes = require('./routes/reportRoutes');
-const userRoutes = require('./routes/userRoutes');
+const { connectDB } = require("./config/db");
+const authRoutes = require("./routes/authRoutes");
+const transactionRoutes = require("./routes/transactionRoutes");
+const categoryRoutes = require("./routes/categoryRoutes");
+const reportRoutes = require("./routes/reportRoutes");
+const userRoutes = require("./routes/userRoutes");
 
 dotenv.config();
 
@@ -19,41 +19,38 @@ const app = express();
 app.use(helmet());
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "https://finora-iota-ivory.vercel.app",
-    ],
+    origin: "https://finora981.vercel.app",
     credentials: true,
-  })
+  }),
 );
-app.use(morgan('dev'));
+app.use(morgan("dev"));
 app.use(express.json());
 
 // Connect to DB (safe for serverless)
-connectDB().catch(err => {
+connectDB().catch((err) => {
   console.error("DB connection failed:", err.message);
 });
 
 // Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/transactions', transactionRoutes);
-app.use('/api/savings', require('./routes/savingsRoutes'));
-app.use('/api/categories', categoryRoutes);
-app.use('/api/reports', reportRoutes);
-app.use('/api/dashboard', require('./routes/dashboardRoutes.js'));
+app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/transactions", transactionRoutes);
+app.use("/api/savings", require("./routes/savingsRoutes"));
+app.use("/api/categories", categoryRoutes);
+app.use("/api/reports", reportRoutes);
+app.use("/api/dashboard", require("./routes/dashboardRoutes.js"));
 
 // Health check (very useful)
-app.get('/', (req, res) => {
-  res.json({ message: 'Finora Backend is running!' });
+app.get("/", (req, res) => {
+  res.json({ message: "Finora Backend is running!" });
 });
 
-app.get('/api', (req, res) => {
-  res.json({ message: 'API is working' });
+app.get("/api", (req, res) => {
+  res.json({ message: "API is working" });
 });
 
 // Error handling
-const errorHandler = require('./middleware/errorHandler.js');
+const errorHandler = require("./middleware/errorHandler.js");
 app.use(errorHandler);
 
 // ✅ Important for Vercel

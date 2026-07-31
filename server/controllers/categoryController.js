@@ -6,7 +6,7 @@ const addCategory = async (req, res) => {
     const category = await createCategory(req.user.id, name, color);
     res.status(201).json(category);
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server Error in addCategory', error: error.message });
   }
 };
 
@@ -15,7 +15,7 @@ const getUserCategories = async (req, res) => {
     const categories = await getCategories(req.user.id);
     res.json(categories);
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server Error in getUserCategories', error: error.message });
   }
 };
 
@@ -26,7 +26,7 @@ const updateUserCategory = async (req, res) => {
     if (!category) return res.status(404).json({ message: 'Category not found' });
     res.json(category);
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server Error in updateUserCategory', error: error.message });
   }
 };
 
@@ -36,7 +36,7 @@ const deleteUserCategory = async (req, res) => {
     if (!category) return res.status(404).json({ message: 'Category not found' });
     res.json({ message: 'Category deleted successfully' });
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server Error in deleteUserCategory', error: error.message });
   }
 };
 
