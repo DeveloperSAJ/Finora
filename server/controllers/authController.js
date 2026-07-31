@@ -30,7 +30,7 @@ const register = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server error during registration' });
+    res.status(500).json({ message: 'Server Error in register', error: error.message });
   }
 };
 
@@ -59,7 +59,7 @@ const login = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server error during login' });
+    res.status(500).json({ message: 'Server Error in login', error: error.message });
   }
 };
 
@@ -69,7 +69,7 @@ const getMe = async (req, res) => {
     if (!user) return res.status(404).json({ message: 'User not found' });
     res.json(user);
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server Error in getMe', error: error.message });
   }
 };
 
@@ -95,7 +95,7 @@ const changePassword = async (req, res) => {
     res.json({ message: 'Password changed successfully' });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server Error in changePassword', error: error.message });
   }
 };
 
@@ -113,7 +113,7 @@ const deleteAccount = async (req, res) => {
     res.json({ message: 'Account deleted successfully' });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server Error in deleteAccount', error: error.message });
   }
 };
 
