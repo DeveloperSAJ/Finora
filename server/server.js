@@ -14,14 +14,13 @@ const userRoutes = require('./routes/userRoutes');
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(helmet());
 app.use(
   cors({
     origin: [
-      "http://localhost:5173", // Vite local frontend
+      "http://localhost:5173",
       "https://finora-iota-ivory.vercel.app",
     ],
     credentials: true,
@@ -29,6 +28,11 @@ app.use(
 );
 app.use(morgan('dev'));
 app.use(express.json());
+
+// Connect to DB (safe for serverless)
+connectDB().catch(err => {
+  console.error("DB connection failed:", err.message);
+});
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -39,19 +43,26 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/dashboard', require('./routes/dashboardRoutes.js'));
 
+// Health check (very useful)
+app.get('/', (req, res) => {
+  res.json({ message: 'Finora Backend is running!' });
+});
+
+app.get('/api', (req, res) => {
+  res.json({ message: 'API is working' });
+});
+
 // Error handling
 const errorHandler = require('./middleware/errorHandler.js');
 app.use(errorHandler);
 
-const startServer = async () => {
-  try {
-    await connectDB();
-    app.listen(PORT, () => {
-      console.log(`🚀 Server running on port ${PORT}`);
-    });
-  } catch (error) {
-    console.error('Failed to start server:', error);
-  }
-};
+// ✅ Important for Vercel
+module.exports = app;
 
-startServer();
+// Only listen when running locally
+if (require.main === module) {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+  });
+}
