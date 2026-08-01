@@ -165,7 +165,14 @@ const Reports = () => {
 
       yPosition += 7;
 
-      monthlyDailyTrend.forEach((row) => {
+      const filteredTrend = monthlyDailyTrend.filter(
+        (row) =>
+          Number(row.income) !== 0 ||
+          Number(row.expense) !== 0 ||
+          Number(row.savings) !== 0,
+      );
+
+      filteredTrend.forEach((row) => {
         if (yPosition > 280) {
           pdf.addPage();
 
