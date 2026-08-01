@@ -29,10 +29,7 @@ app.use(
   })
 );
 
-// Important: Handle preflight requests
-app.options("*", cors());
 app.use(helmet());
-
 app.use(morgan("dev"));
 app.use(express.json());
 
