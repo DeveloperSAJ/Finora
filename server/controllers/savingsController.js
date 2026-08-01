@@ -1,26 +1,22 @@
-const { pool } = require('../config/db');
+const { addSavings, getSavings } = require('../models/savingsModel');
 
-const addSavings = async (userId, amount, description, type, transactionDate) => {
-  const query = `
-    INSERT INTO savings (user_id, amount, description, type, transaction_date)
-    VALUES ($1, $2, $3, $4, $5) 
-    RETURNING *
-  `;
-  const result = await pool.query(query, [userId, amount, description, type, transactionDate]);
-  return result.rows[0];
+const addSaving = async (req, res) => {
+  try {
+    const { amount, description, type, transaction_date } = req.body;
+    const saving = await addSavings(req.user.id, amount, description, type, transaction_date);
+    res.status(201).json(saving);
+  } catch (error) {
+    res.status(500).json({ message: 'Server Error in addSaving', error: error.message });
+  }
 };
 
-const getSavings = async (userId) => {
-  const query = `
-    SELECT * FROM savings 
-    WHERE user_id = $1 
-    ORDER BY transaction_date DESC
-  `;
-  const result = await pool.query(query, [userId]);
-  return result.rows;
+const getUserSavings = async (req, res) => {
+  try {
+    const savings = await getSavings(req.user.id);
+    res.json(savings);
+  } catch (error) {
+    res.status(500).json({ message: 'Server Error in getUserSavings', error: error.message });
+  }
 };
 
-module.exports = { 
-  addSavings, 
-  getSavings 
-};
+module.exports = { addSaving, getUserSavings };

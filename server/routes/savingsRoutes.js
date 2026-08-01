@@ -1,12 +1,12 @@
 const express = require('express');
 const authenticateToken = require('../middleware/auth');
-const { addSavings, getSavings } = require('../controllers/savingsController');
+const { addSaving, getUserSavings } = require('../controllers/savingsController');
 const { pool } = require('../config/db');
 
 const router = express.Router();
 
-router.post('/', authenticateToken, addSavings);
-router.get('/', authenticateToken, getSavings);
+router.post('/', authenticateToken, addSaving);
+router.get('/', authenticateToken, getUserSavings);
 // Delete single saving
 router.delete('/:id', authenticateToken, async (req, res) => {
   try {
