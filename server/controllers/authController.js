@@ -10,31 +10,27 @@ const {
 } = require("../models/userModel");
 
 const validatePassword = (password) => {
-  const errors = [];
-
   if (password.length < 8) {
-    errors.push("Password must be at least 8 characters long.");
+    return "Password must be at least 8 characters long.";
   }
 
   if (!/[a-z]/.test(password)) {
-    errors.push("Password must contain at least one lowercase letter.");
+    return "Password must contain at least one lowercase letter.";
   }
 
   if (!/[A-Z]/.test(password)) {
-    errors.push("Password must contain at least one uppercase letter.");
+    return "Password must contain at least one uppercase letter.";
   }
 
   if (!/\d/.test(password)) {
-    errors.push("Password must contain at least one number.");
+    return "Password must contain at least one number.";
   }
 
   if (!/[@$!%*?&]/.test(password)) {
-    errors.push(
-      "Password must contain at least one special character (@$!%*?&)."
-    );
+    return "Password must contain at least one special character (@$!%*?&).";
   }
 
-  return errors;
+  return null; // password is valid
 };
 
 const register = async (req, res) => {
@@ -64,10 +60,10 @@ const register = async (req, res) => {
     });
   }
 
-  const errors = validatePassword(password);
+  const passwordError = validatePassword(password);
 
-  if (errors.length) {
-    return res.status(400).json({ errors });
+  if (passwordError) {
+    return res.status(400).json({ message: passwordError });
   }
 
   try {
@@ -83,14 +79,10 @@ const register = async (req, res) => {
 
     const user = await createUser(username, email, hashedPassword);
 
-    const token = jwt.sign(
-      { id: user.id },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: "7d",
-        issuer: "your-api",
-      }
-    );
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+      issuer: "your-api",
+    });
 
     res.status(201).json({
       token,
@@ -135,13 +127,9 @@ const login = async (req, res) => {
       });
     }
 
-    const token = jwt.sign(
-      { id: user.id },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: "7d"
-      }
-    );
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
 
     res.json({
       token,
@@ -192,17 +180,14 @@ const changePassword = async (req, res) => {
 
     if (currentPassword === newPassword) {
       return res.status(400).json({
-        message:
-          "New password must be different from the current password.",
+        message: "New password must be different from the current password.",
       });
     }
 
-    const passwordErrors = validatePassword(newPassword);
+    const passwordError = validatePassword(newPassword);
 
-    if (passwordErrors.length) {
-      return res.status(400).json({
-        errors: passwordErrors,
-      });
+    if (passwordError) {
+      return res.status(400).json({ message: passwordError });
     }
 
     const user = await findUserById(req.user.id);
@@ -213,10 +198,7 @@ const changePassword = async (req, res) => {
       });
     }
 
-    const isMatch = await bcrypt.compare(
-      currentPassword,
-      user.password
-    );
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
 
     if (!isMatch) {
       return res.status(400).json({
