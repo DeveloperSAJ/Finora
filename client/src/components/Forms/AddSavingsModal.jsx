@@ -1,4 +1,3 @@
-import { useState } from "react";
 import Button from "../Buttons/Button";
 import { X } from "lucide-react";
 import { toast } from "react-hot-toast";
