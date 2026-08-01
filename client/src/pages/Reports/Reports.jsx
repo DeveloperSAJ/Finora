@@ -58,8 +58,12 @@ const Reports = () => {
       setMonthlyDailyTrend(trendRes.data);
 
       const totalSavings = savingsRes.data.reduce((sum, s) => {
-        return sum + (s.type === "add" ? parseFloat(s.amount) : -parseFloat(s.amount));
+        return (
+          sum +
+          (s.type === "deposit" ? parseFloat(s.amount) : -parseFloat(s.amount))
+        );
       }, 0);
+
       setSavingsSummary(totalSavings);
     } catch (error) {
       console.error("Failed to fetch reports", error);
@@ -68,8 +72,10 @@ const Reports = () => {
     }
   };
 
-  const totalIncome = monthlyReport.find((r) => r.type === "income")?.total || 0;
-  const totalExpense = monthlyReport.find((r) => r.type === "expense")?.total || 0;
+  const totalIncome =
+    monthlyReport.find((r) => r.type === "income")?.total || 0;
+  const totalExpense =
+    monthlyReport.find((r) => r.type === "expense")?.total || 0;
   const netBalance = totalIncome - totalExpense;
 
   const exportToPDF = async () => {
@@ -82,15 +88,17 @@ const Reports = () => {
       let yPosition = 20;
 
       pdf.setFontSize(22);
-      pdf.text("Finora Financial Report", pageWidth / 2, yPosition, { align: "center" });
+      pdf.text("Finora Financial Report", pageWidth / 2, yPosition, {
+        align: "center",
+      });
       yPosition += 15;
 
       pdf.setFontSize(12);
       const reportDate = selectedMonth
         ? `Month: ${selectedMonth}`
         : selectedDate
-        ? `Date: ${selectedDate}`
-        : "Current Period";
+          ? `Date: ${selectedDate}`
+          : "Current Period";
       pdf.text(reportDate, pageWidth / 2, yPosition, { align: "center" });
       yPosition += 20;
 
@@ -99,13 +107,29 @@ const Reports = () => {
       yPosition += 10;
 
       pdf.setFontSize(12);
-      pdf.text(`Total Income    : Rs ${parseFloat(totalIncome).toLocaleString()}`, 20, yPosition);
+      pdf.text(
+        `Total Income    : Rs ${parseFloat(totalIncome).toLocaleString()}`,
+        20,
+        yPosition,
+      );
       yPosition += 8;
-      pdf.text(`Total Expense  : Rs ${parseFloat(totalExpense).toLocaleString()}`, 20, yPosition);
+      pdf.text(
+        `Total Expense  : Rs ${parseFloat(totalExpense).toLocaleString()}`,
+        20,
+        yPosition,
+      );
       yPosition += 8;
-      pdf.text(`Net Balance     : Rs ${parseFloat(netBalance).toLocaleString()}`, 20, yPosition);
+      pdf.text(
+        `Net Balance     : Rs ${parseFloat(netBalance).toLocaleString()}`,
+        20,
+        yPosition,
+      );
       yPosition += 8;
-      pdf.text(`Total Savings   : Rs ${parseFloat(savingsSummary).toLocaleString()}`, 20, yPosition);
+      pdf.text(
+        `Total Savings   : Rs ${parseFloat(savingsSummary).toLocaleString()}`,
+        20,
+        yPosition,
+      );
       yPosition += 20;
 
       pdf.setFontSize(14);
@@ -116,9 +140,51 @@ const Reports = () => {
         pdf.text(
           `${item.type.toUpperCase()}: Rs ${parseFloat(item.total).toLocaleString()} (${item.count} tx)`,
           20,
-          yPosition
+          yPosition,
         );
         yPosition += 8;
+      });
+      yPosition += 12;
+
+      if (yPosition > 250) {
+        pdf.addPage();
+        yPosition = 20;
+      }
+
+      pdf.setFontSize(15);
+      pdf.text("Daily Trend Data", 20, yPosition);
+
+      yPosition += 10;
+
+      pdf.setFontSize(10);
+
+      pdf.text("Day", 20, yPosition);
+      pdf.text("Income", 50, yPosition);
+      pdf.text("Expense", 90, yPosition);
+      pdf.text("Savings", 140, yPosition);
+
+      yPosition += 7;
+
+      monthlyDailyTrend.forEach((row) => {
+        if (yPosition > 280) {
+          pdf.addPage();
+
+          yPosition = 20;
+
+          pdf.text("Day", 20, yPosition);
+          pdf.text("Income", 50, yPosition);
+          pdf.text("Expense", 90, yPosition);
+          pdf.text("Savings", 140, yPosition);
+
+          yPosition += 7;
+        }
+
+        pdf.text(String(row.day), 20, yPosition);
+        pdf.text(`Rs ${Number(row.income).toLocaleString()}`, 50, yPosition);
+        pdf.text(`Rs ${Number(row.expense).toLocaleString()}`, 90, yPosition);
+        pdf.text(`Rs ${Number(row.savings).toLocaleString()}`, 140, yPosition);
+
+        yPosition += 7;
       });
 
       const fileName = `Finora_Report_${selectedMonth || selectedDate || Date.now()}.pdf`;
@@ -138,7 +204,9 @@ const Reports = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-800 dark:text-white">Reports</h1>
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-800 dark:text-white">
+            Reports
+          </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1 text-sm md:text-base">
             Track your financial performance
           </p>
@@ -149,7 +217,9 @@ const Reports = () => {
           className="flex items-center gap-2 w-full sm:w-auto"
         >
           <Download className="w-4 h-4" />
-          <span className="text-sm">{exporting ? "Exporting..." : "Export"}</span>
+          <span className="text-sm">
+            {exporting ? "Exporting..." : "Export"}
+          </span>
         </Button>
       </div>
 
@@ -225,14 +295,19 @@ const Reports = () => {
 
         {/* Summary Cards - stack on mobile */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <Card title={selectedMonth ? "Month Overview" : "This Month"} className="p-4 md:p-6">
+          <Card
+            title={selectedMonth ? "Month Overview" : "This Month"}
+            className="p-4 md:p-6"
+          >
             <div className="space-y-5">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-emerald-100 dark:bg-emerald-900/30 rounded-2xl flex items-center justify-center flex-shrink-0">
                   <span className="text-lg">↑</span>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Total Income</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Total Income
+                  </p>
                   <p className="text-xl md:text-2xl font-bold text-emerald-600">
                     Rs {parseFloat(totalIncome).toLocaleString()}
                   </p>
@@ -244,7 +319,9 @@ const Reports = () => {
                   <span className="text-lg">↓</span>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Total Expense</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Total Expense
+                  </p>
                   <p className="text-xl md:text-2xl font-bold text-red-600">
                     Rs {parseFloat(totalExpense).toLocaleString()}
                   </p>
@@ -252,8 +329,12 @@ const Reports = () => {
               </div>
 
               <div className="pt-4 border-t dark:border-gray-700 flex justify-between items-center">
-                <p className="text-sm font-medium text-gray-800 dark:text-white">Net Balance</p>
-                <p className={`text-xl font-bold ${netBalance >= 0 ? "text-emerald-600" : "text-red-600"}`}>
+                <p className="text-sm font-medium text-gray-800 dark:text-white">
+                  Net Balance
+                </p>
+                <p
+                  className={`text-xl font-bold ${netBalance >= 0 ? "text-emerald-600" : "text-red-600"}`}
+                >
                   Rs {parseFloat(netBalance).toLocaleString()}
                 </p>
               </div>
@@ -268,7 +349,9 @@ const Reports = () => {
               <p className="text-3xl md:text-4xl font-bold text-emerald-600">
                 Rs {parseFloat(savingsSummary).toLocaleString()}
               </p>
-              <p className="text-gray-500 dark:text-gray-400 mt-2 text-sm">Total Savings</p>
+              <p className="text-gray-500 dark:text-gray-400 mt-2 text-sm">
+                Total Savings
+              </p>
             </div>
           </Card>
 
@@ -278,7 +361,9 @@ const Reports = () => {
           >
             <div className="space-y-3">
               {loading ? (
-                <p className="text-center py-8 text-gray-500 dark:text-gray-400 text-sm">Loading...</p>
+                <p className="text-center py-8 text-gray-500 dark:text-gray-400 text-sm">
+                  Loading...
+                </p>
               ) : dailyReport.length > 0 ? (
                 dailyReport.map((item, index) => (
                   <div
@@ -300,7 +385,9 @@ const Reports = () => {
                 ))
               ) : (
                 <p className="text-gray-500 dark:text-gray-400 py-8 text-center text-sm">
-                  {selectedDate ? "No transactions on this date" : "No transactions today"}
+                  {selectedDate
+                    ? "No transactions on this date"
+                    : "No transactions today"}
                 </p>
               )}
             </div>
@@ -321,7 +408,11 @@ const Reports = () => {
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={monthlyDailyTrend}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                  <XAxis dataKey="day" stroke="#9ca3af" tick={{ fontSize: 11 }} />
+                  <XAxis
+                    dataKey="day"
+                    stroke="#9ca3af"
+                    tick={{ fontSize: 11 }}
+                  />
                   <YAxis stroke="#9ca3af" tick={{ fontSize: 11 }} width={40} />
                   <Tooltip
                     contentStyle={{
