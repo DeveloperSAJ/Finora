@@ -11,6 +11,12 @@ const UseSavingsModal = ({ isOpen, onClose, onSavingsAdded }) => {
     transaction_date: new Date().toISOString().split("T")[0],
   });
   const [loading, setLoading] = useState(false);
+  
+  useEffect(() => {
+    if (isOpen) {
+      resetForm();
+    }
+  }, [isOpen]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -31,23 +37,19 @@ const UseSavingsModal = ({ isOpen, onClose, onSavingsAdded }) => {
     try {
       await api.post("/savings", {
         ...formData,
-        type: "use",
+        type: "withdrawal", // Changed from "use" to "withdrawal"
       });
       toast.success("Savings used successfully!");
       resetForm();
       onSavingsAdded();
       onClose();
     } catch (error) {
-      toast.error("Failed to use savings");
+      console.error(error);
+      toast.error(error.response?.data?.message || "Failed to use savings");
     } finally {
       setLoading(false);
     }
   };
-  useEffect(() => {
-    if (isOpen) {
-      resetForm();
-    }
-  }, [isOpen]);
 
   if (!isOpen) return null;
 

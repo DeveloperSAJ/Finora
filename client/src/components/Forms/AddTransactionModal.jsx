@@ -43,6 +43,13 @@ const AddTransactionModal = ({ isOpen, onClose, onTransactionAdded }) => {
     setShowNewCategory(false);
     setNewCategoryName("");
   };
+  
+  useEffect(() => {
+    if (isOpen) {
+      resetForm();
+      fetchCategories();
+    }
+  }, [isOpen]);
 
   const createNewCategory = async () => {
     if (!newCategoryName.trim())
@@ -79,12 +86,6 @@ const AddTransactionModal = ({ isOpen, onClose, onTransactionAdded }) => {
       setLoading(false);
     }
   };
-  useEffect(() => {
-    if (isOpen) {
-      resetForm();
-      fetchCategories();
-    }
-  }, [isOpen]);
 
   if (!isOpen) return null;
 

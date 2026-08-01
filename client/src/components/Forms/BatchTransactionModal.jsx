@@ -33,11 +33,17 @@ const BatchTransactionModal = ({ isOpen, onClose, onTransactionAdded }) => {
         category_id: "",
       },
     ]);
-
+    
     setType("expense");
     setTransactionDate(new Date().toISOString().split("T")[0]);
   };
-
+  
+  useEffect(() => {
+    if (isOpen) {
+      resetForm();
+      fetchCategories();
+    }
+  }, [isOpen]);
   const addItem = () => {
     setItems([...items, { description: "", amount: "", category_id: "" }]);
   };
@@ -91,12 +97,6 @@ const BatchTransactionModal = ({ isOpen, onClose, onTransactionAdded }) => {
     }
   };
 
-  useEffect(() => {
-    if (isOpen) {
-      resetForm();
-      fetchCategories();
-    }
-  }, [isOpen]);
 
   if (!isOpen) return null;
 

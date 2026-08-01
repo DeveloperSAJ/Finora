@@ -12,11 +12,11 @@ const AddSavingsModal = ({ isOpen, onClose, onSavingsAdded }) => {
     transaction_date: new Date().toISOString().split("T")[0],
   });
   const [loading, setLoading] = useState(false);
-
+  
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-
+  
   const resetForm = () => {
     setFormData({
       amount: "",
@@ -24,31 +24,33 @@ const AddSavingsModal = ({ isOpen, onClose, onSavingsAdded }) => {
       transaction_date: new Date().toISOString().split("T")[0],
     });
   };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-
-    try {
-      await api.post("/savings", {
-        ...formData,
-        type: "add",
-      });
-      toast.success("Savings added successfully!");
-      resetForm();
-      onSavingsAdded();
-      onClose();
-    } catch (error) {
-      toast.error("Failed to add savings");
-    } finally {
-      setLoading(false);
-    }
-  };
+  
   useEffect(() => {
     if (isOpen) {
       resetForm();
     }
   }, [isOpen]);
+  
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+
+  try {
+    await api.post("/savings", {
+      ...formData,
+      type: "deposit",        // Changed from "add" to "deposit"
+    });
+    toast.success("Savings added successfully!");
+    resetForm();
+    onSavingsAdded();
+    onClose();
+  } catch (error) {
+    console.error(error);
+    toast.error(error.response?.data?.message || "Failed to add savings");
+  } finally {
+    setLoading(false);
+  }
+};
 
   if (!isOpen) return null;
 
